@@ -285,6 +285,10 @@ class HuaweiClient
      */
     public function log($msg, $level = Logger::INFO, $context = null)
     {
+        if(!is_array($context)){
+            $context = array();
+        }
+
         if ($this->logger) {
             $this->logger->log($level, $msg, $context);
         }
