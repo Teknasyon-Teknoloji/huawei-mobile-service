@@ -25,7 +25,7 @@ class HuaweiClient
     private $config;
 
     /**
-     * @var \Redis
+     * @var \Redis | \RedisCluster
      */
     private $redis;
 
@@ -307,9 +307,9 @@ class HuaweiClient
     /**
      * Set the Redis object
      *
-     * @param \Redis $redis
+     * @param \Redis | \RedisCluster $redis
      */
-    public function setRedis(\Redis $redis)
+    public function setRedis($redis)
     {
         $this->redis = $redis;
     }
