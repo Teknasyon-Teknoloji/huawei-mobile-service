@@ -3,13 +3,14 @@
 namespace Teknasyon\HuaweiMobileService;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
-use Monolog\Logger;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use Teknasyon\HuaweiMobileService\InAppPurchase\Exceptions\HuaweiException;
 
 class HuaweiClient
@@ -56,12 +57,12 @@ class HuaweiClient
 
     /**
      * @param Request $request
-     * @param string  $expectedClass
+     * @param null|string  $expectedClass
      *
-     * @return ResponseInterface|expectedClass
-     * @throws HuaweiException
+     * @return ResponseInterface|mixed
+     * @throws HuaweiException|GuzzleException
      */
-    public function execute(Request $request, $expectedClass = "")
+    public function execute(Request $request, $expectedClass = null)
     {
         $request = $this->authorize($request);
 
@@ -97,7 +98,7 @@ class HuaweiClient
      * @param RequestInterface  $request The http response to be decoded.
      * @param null              $expectedClass
      *
-     * @return ResponseInterface|expectedClass
+     * @return ResponseInterface|mixed
      * @throws HuaweiException
      */
     private function decodeHttpResponse(
@@ -129,7 +130,7 @@ class HuaweiClient
             try {
                 return new $expectedClass($json);
             } catch (\Exception $e) {
-                self::log(' Huawei Client Error : Expected Class not found', Logger::WARNING);
+                self::log(' Huawei Client Error : Expected Class not found', LogLevel::WARNING);
             }
         }
 
@@ -144,11 +145,8 @@ class HuaweiClient
         }
 
         // if we don't have a request, we just use what's passed in
-        if (null === $request) {
-            return $expectedClass;
-        }
-
         return $expectedClass;
+
     }
 
     private function authorize(Request $request)
@@ -208,7 +206,6 @@ class HuaweiClient
             }
             sleep(1);
         } while (1);
-        return null;
     }
 
     private function requestAccessTokenFromHuawei()
@@ -232,14 +229,14 @@ class HuaweiClient
             if ($responseStatus == 200 && isset($result['access_token']) && $result['access_token'] != '') {
                 $this->log(
                     'Huawei Client Error, Request: ' . json_encode($requestParams) . ', Response: ' .
-                    $responseBody, Logger::DEBUG
+                    $responseBody, LogLevel::DEBUG
                 );
                 return [$result['access_token'], $result['expires_in']];
             } else {
                 $this->log(
                     'Huawei Client Error, Resfresh Token Failed! HttpStatusCode: ' . $responseStatus .
                     ', Request: ' . json_encode($requestParams) . ', Response: ' . $responseBody,
-                    Logger::ERROR
+                    LogLevel::ERROR
                 );
             }
 
@@ -283,15 +280,13 @@ class HuaweiClient
      * @param int    $level
      * @param null   $context
      */
-    public function log($msg, $level = Logger::INFO, $context = null)
+    public function log($msg, $level = LogLevel::INFO, $context = null)
     {
         if(!is_array($context)){
             $context = array();
         }
 
-        if ($this->logger) {
-            $this->logger->log($level, $msg, $context);
-        }
+        $this->logger?->log($level, $msg, $context);
     }
 
     /**

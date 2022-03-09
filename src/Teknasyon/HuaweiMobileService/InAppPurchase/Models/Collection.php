@@ -76,17 +76,19 @@ class Collection extends Model implements \Iterator, \Countable
     public function offsetSet($offset, $value)
     {
         if (!is_numeric($offset)) {
-            return parent::offsetSet($offset, $value);
+            parent::offsetSet($offset, $value);
+        } else {
+            $this->{$this->collection_key}[$offset] = $value;
         }
-        $this->{$this->collection_key}[$offset] = $value;
     }
 
     public function offsetUnset($offset)
     {
         if (!is_numeric($offset)) {
-            return parent::offsetUnset($offset);
+            parent::offsetUnset($offset);
+        } else {
+            unset($this->{$this->collection_key}[$offset]);
         }
-        unset($this->{$this->collection_key}[$offset]);
     }
 
     private function coerceType($offset)

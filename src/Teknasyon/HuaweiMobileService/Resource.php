@@ -3,7 +3,7 @@
 namespace Teknasyon\HuaweiMobileService;
 
 use GuzzleHttp\Psr7\Request;
-use Monolog\Logger;
+use Psr\Log\LogLevel;
 use Psr\Http\Message\ResponseInterface;
 use Teknasyon\HuaweiMobileService\HuaweiClient as Client;
 use Teknasyon\HuaweiMobileService\InAppPurchase\Exceptions\HuaweiException;
@@ -50,7 +50,7 @@ class Resource
      *
      * @param $expectedClass - optional, the expected class name
      *
-     * @return ResponseInterface|expectedClass
+     * @return ResponseInterface|mixed
      * @throws HuaweiException
      */
     public function call($name, $arguments, $expectedClass = null)
@@ -58,7 +58,7 @@ class Resource
         if (!isset($this->methods[$name])) {
             $this->client->log(
                 'Service method unknown',
-                Logger::ERROR,
+                LogLevel::ERROR,
                 array(
                     'service' => $this->serviceName,
                     'resource' => $this->resourceName,
@@ -111,7 +111,7 @@ class Resource
             if ($key != 'postBody' && !isset($method['parameters'][$key])) {
                 $this->client->log(
                     'Service parameter unknown',
-                    Logger::ERROR,
+                    LogLevel::ERROR,
                     array(
                         'service' => $this->serviceName,
                         'resource' => $this->resourceName,
@@ -127,7 +127,7 @@ class Resource
             if (isset($paramSpec['required']) && $paramSpec['required'] && !isset($parameters[$paramName])) {
                 $this->client->log(
                     'Service parameter missing',
-                    Logger::ERROR,
+                    LogLevel::ERROR,
                     array(
                         'service' => $this->serviceName,
                         'resource' => $this->resourceName,
@@ -150,7 +150,7 @@ class Resource
 
         $this->client->log(
             'Service Call',
-            Logger::INFO,
+            LogLevel::INFO,
             array(
                 'service' => $this->serviceName,
                 'resource' => $this->resourceName,
@@ -200,7 +200,7 @@ class Resource
     private function createRequestUri($restPath, $params)
     {
         // Override the default servicePath address if the $restPath use a /
-        if ('/' == substr($restPath, 0, 1)) {
+        if (str_starts_with($restPath, '/')) {
             $requestUrl = substr($restPath, 1);
         } else {
             $requestUrl = $restPath;
@@ -208,7 +208,7 @@ class Resource
 
         // code for leading slash
         if ($this->rootUrl) {
-            if ('/' !== substr($this->rootUrl, -1) && '/' !== substr($requestUrl, 0, 1)) {
+            if (!str_ends_with($this->rootUrl, '/') && !str_starts_with($requestUrl, '/')) {
                 $requestUrl = '/' . $requestUrl;
             }
             $requestUrl = $this->rootUrl . $requestUrl;

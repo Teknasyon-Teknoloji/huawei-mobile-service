@@ -58,7 +58,7 @@ abstract class Model implements \ArrayAccess
             }
 
             if ($this->isAssociativeArray($val)) {
-                if ($keyDataType && 'map' == $keyDataType) {
+                if ('map' == $keyDataType) {
                     foreach ($val as $arrayKey => $arrayItem) {
                         $this->modelData[$key][$arrayKey]
                             = new $keyType($arrayItem);
@@ -78,7 +78,7 @@ abstract class Model implements \ArrayAccess
             $this->processed[$key] = true;
         }
 
-        return isset($this->modelData[$key]) ? $this->modelData[$key] : null;
+        return $this->modelData[$key] ?? null;
     }
 
     /**
@@ -255,11 +255,7 @@ abstract class Model implements \ArrayAccess
 
     public function offsetGet($offset)
     {
-        return isset($this->$offset)
-            ?
-            $this->$offset
-            :
-            $this->__get($offset);
+        return $this->$offset ?? $this->__get($offset);
     }
 
     public function offsetSet($offset, $value)
