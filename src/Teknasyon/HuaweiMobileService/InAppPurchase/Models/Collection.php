@@ -73,7 +73,7 @@ class Collection extends Model implements \Iterator, \Countable
         return $this->{$this->collection_key}[$offset];
     }
 
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         if (!is_numeric($offset)) {
             parent::offsetSet($offset, $value);
@@ -82,7 +82,7 @@ class Collection extends Model implements \Iterator, \Countable
         }
     }
 
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         if (!is_numeric($offset)) {
             parent::offsetUnset($offset);
