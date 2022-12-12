@@ -253,7 +253,7 @@ abstract class Model implements \ArrayAccess
         return isset($this->$offset) || isset($this->modelData[$offset]);
     }
 
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         return $this->$offset ?? $this->__get($offset);
     }

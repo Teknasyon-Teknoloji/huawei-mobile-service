@@ -20,21 +20,24 @@ class Collection extends Model implements \Iterator, \Countable
         }
     }
 
-    public function current()
+    public function current(): mixed
     {
         $this->coerceType($this->key());
         if (is_array($this->{$this->collection_key})) {
             return current($this->{$this->collection_key});
         }
+        return false;
     }
 
-    public function key()
+    public function key(): mixed
     {
         if (isset($this->{$this->collection_key})
             && is_array($this->{$this->collection_key})
         ) {
             return key($this->{$this->collection_key});
         }
+        
+        return null;
     }
 
     public function next()
@@ -64,7 +67,7 @@ class Collection extends Model implements \Iterator, \Countable
         return isset($this->{$this->collection_key}[$offset]);
     }
 
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         if (!is_numeric($offset)) {
             return parent::offsetGet($offset);
