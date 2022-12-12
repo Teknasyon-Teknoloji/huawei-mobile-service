@@ -248,7 +248,7 @@ abstract class Model implements \ArrayAccess
         }
     }
 
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return isset($this->$offset) || isset($this->modelData[$offset]);
     }
