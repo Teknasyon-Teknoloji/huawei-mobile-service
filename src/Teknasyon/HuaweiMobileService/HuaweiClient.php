@@ -109,7 +109,7 @@ class HuaweiClient
         $code = $response->getStatusCode();
 
         // retry strategy
-        if (intVal($code) >= 400) {
+        if (intval($code) >= 400) {
             // if we errored out, it should be safe to grab the response body
             $body = (string)$response->getBody();
 
@@ -124,7 +124,7 @@ class HuaweiClient
             
             //huawei error codes is greater 5
             //https://developer.huawei.com/consumer/en/doc/development/HMSCore-References/server-error-code-0000001050166248
-            if (isset($json['responseCode']) && intVal($json['responseCode']) >= 5) {
+            if (isset($json['responseCode']) && intval($json['responseCode']) >= 5) {
                 $errorMessage = $json['responseMessage'] ?? 'Undefined error in Huawei!';
                 throw new HuaweiException($errorMessage, 410);
             }
