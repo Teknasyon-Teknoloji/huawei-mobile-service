@@ -34,31 +34,31 @@ class Publisher
             array(
                 'methods' => array(
                     'stop' => array(
-                        'path' => 'https://subscr-dre.iap.hicloud.com/sub/applications/' . $this->version
+                        'path' => 'https://subscr-dre.iap.cloud.huawei.eu/sub/applications/' . $this->version
                             . '/purchases/stop',
                         'httpMethod' => 'POST',
                         'parameters' => array(),
                     ),
                     'delay' => array(
-                        'path' => 'https://subscr-dre.iap.hicloud.com/sub/applications/' . $this->version
+                        'path' => 'https://subscr-dre.iap.cloud.huawei.eu/sub/applications/' . $this->version
                             . '/purchases/delay',
                         'httpMethod' => 'POST',
                         'parameters' => array(),
                     ),
                     'get' => array(
-                        'path' => 'https://subscr-dre.iap.hicloud.com/sub/applications/' . $this->version
+                        'path' => 'https://subscr-dre.iap.cloud.huawei.eu/sub/applications/' . $this->version
                             . '/purchases/get',
                         'httpMethod' => 'POST',
                         'parameters' => array(),
                     ),
                     'returnFee' => array(
-                        'path' => 'https://subscr-dre.iap.hicloud.com/sub/applications/' . $this->version
+                        'path' => 'https://subscr-dre.iap.cloud.huawei.eu/sub/applications/' . $this->version
                             . '/purchases/returnFee',
                         'httpMethod' => 'POST',
                         'parameters' => array(),
                     ),
                     'withdrawal' => array(
-                        'path' => 'https://subscr-dre.iap.hicloud.com/sub/applications/' . $this->version
+                        'path' => 'https://subscr-dre.iap.cloud.huawei.eu/sub/applications/' . $this->version
                             . '/purchases/withdrawal',
                         'httpMethod' => 'POST',
                         'parameters' => array(),
@@ -73,7 +73,7 @@ class Publisher
             array(
                 'methods' => array(
                     'get' => array(
-                        'path' => 'https://orders-dre.iap.hicloud.com/applications/purchases/tokens/verify',
+                        'path' => 'https://orders-dre.iap.cloud.huawei.eu/applications/purchases/tokens/verify',
                         'httpMethod' => 'POST',
                         'parameters' => array(),
                     ),
@@ -87,7 +87,7 @@ class Publisher
             array(
                 'methods' => array(
                     'cancelledList' => array(
-                        'path' => 'https://orders-dre.iap.hicloud.com/applications/' . $this->version
+                        'path' => 'https://orders-dre.iap.cloud.huawei.eu/applications/' . $this->version
                             . '/purchases/cancelledList',
                         'httpMethod' => 'POST',
                         'parameters' => array(),
