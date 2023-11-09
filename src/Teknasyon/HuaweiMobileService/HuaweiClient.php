@@ -238,10 +238,6 @@ class HuaweiClient
             $result = json_decode($responseBody, true);
 
             if ($responseStatus == 200 && isset($result['access_token']) && $result['access_token'] != '') {
-                $this->log(
-                    'Huawei Client Error, Request: ' . json_encode($requestParams) . ', Response: ' .
-                    $responseBody, LogLevel::DEBUG
-                );
                 return [$result['access_token'], $result['expires_in']];
             } else {
                 $this->log(
