@@ -11,47 +11,58 @@ class Collection extends Model implements \Iterator, \Countable
 {
     protected $collection_key = 'items';
 
-    public function rewind(): void
+    /** @return void */
+    #[\ReturnTypeWillChange]
+    public function rewind()
     {
-        if (isset($this->{$this->collection_key})
+        if (
+            isset($this->{$this->collection_key})
             && is_array($this->{$this->collection_key})
         ) {
             reset($this->{$this->collection_key});
         }
     }
 
-    public function current(): mixed
+    /** @return mixed */
+    #[\ReturnTypeWillChange]
+    public function current()
     {
         $this->coerceType($this->key());
         if (is_array($this->{$this->collection_key})) {
             return current($this->{$this->collection_key});
         }
-        return false;
     }
 
-    public function key(): mixed
+    /** @return mixed */
+    #[\ReturnTypeWillChange]
+    public function key()
     {
-        if (isset($this->{$this->collection_key})
+        if (
+            isset($this->{$this->collection_key})
             && is_array($this->{$this->collection_key})
         ) {
             return key($this->{$this->collection_key});
         }
-        
-        return null;
     }
 
+    /** @return mixed */
+    #[\ReturnTypeWillChange]
     public function next()
     {
         return next($this->{$this->collection_key});
     }
 
-    public function valid(): bool
+    /** @return bool */
+    #[\ReturnTypeWillChange]
+    public function valid()
     {
         $key = $this->key();
         return $key !== null && $key !== false;
     }
 
-    public function count(): int
+    /** @return int */
+    #[\ReturnTypeWillChange]
+    public function count()
     {
         if (!isset($this->{$this->collection_key})) {
             return 0;
@@ -59,7 +70,9 @@ class Collection extends Model implements \Iterator, \Countable
         return count($this->{$this->collection_key});
     }
 
-    public function offsetExists($offset): bool
+    /** @return bool */
+    #[\ReturnTypeWillChange]
+    public function offsetExists($offset)
     {
         if (!is_numeric($offset)) {
             return parent::offsetExists($offset);
@@ -67,7 +80,8 @@ class Collection extends Model implements \Iterator, \Countable
         return isset($this->{$this->collection_key}[$offset]);
     }
 
-    public function offsetGet($offset): mixed
+    /** @return mixed */
+    public function offsetGet($offset)
     {
         if (!is_numeric($offset)) {
             return parent::offsetGet($offset);
@@ -76,30 +90,32 @@ class Collection extends Model implements \Iterator, \Countable
         return $this->{$this->collection_key}[$offset];
     }
 
-    public function offsetSet($offset, $value): void
+    /** @return void */
+    #[\ReturnTypeWillChange]
+    public function offsetSet($offset, $value)
     {
         if (!is_numeric($offset)) {
             parent::offsetSet($offset, $value);
-        } else {
-            $this->{$this->collection_key}[$offset] = $value;
         }
+        $this->{$this->collection_key}[$offset] = $value;
     }
 
-    public function offsetUnset($offset): void
+    /** @return void */
+    #[\ReturnTypeWillChange]
+    public function offsetUnset($offset)
     {
         if (!is_numeric($offset)) {
             parent::offsetUnset($offset);
-        } else {
-            unset($this->{$this->collection_key}[$offset]);
         }
+        unset($this->{$this->collection_key}[$offset]);
     }
 
     private function coerceType($offset)
     {
         $keyType = $this->keyType($this->collection_key);
         if ($keyType && !is_object($this->{$this->collection_key}[$offset])) {
-            $this->{$this->collection_key}[$offset]
-                = new $keyType($this->{$this->collection_key}[$offset]);
+            $this->{$this->collection_key}[$offset] =
+                new $keyType($this->{$this->collection_key}[$offset]);
         }
     }
 }

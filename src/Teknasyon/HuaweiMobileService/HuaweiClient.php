@@ -134,6 +134,10 @@ class HuaweiClient
                 $json = json_decode($json['inappPurchaseData'], true);
             }
 
+            if (isset($json['cancelledPurchaseList'])) {
+                $json['cancelledPurchaseList'] = json_decode($json['cancelledPurchaseList'], true);
+            }
+
             try {
                 return new $expectedClass($json);
             } catch (\Exception $e) {

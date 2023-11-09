@@ -50,7 +50,7 @@ class CancelledPurchaseListResponse extends Collection
      */
     public function setVoidedPurchases($voidedPurchases)
     {
-        $this->voidedPurchases = $voidedPurchases;
+        $this->cancelledPurchaseList = $voidedPurchases;
     }
 
     /**
@@ -58,6 +58,6 @@ class CancelledPurchaseListResponse extends Collection
      */
     public function getVoidedPurchases()
     {
-        return $this->voidedPurchases;
+        return $this->cancelledPurchaseList;
     }
 }

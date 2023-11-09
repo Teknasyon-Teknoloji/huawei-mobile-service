@@ -6,22 +6,26 @@
 namespace Teknasyon\HuaweiMobileService\InAppPurchase\Models;
 
 use Teknasyon\HuaweiMobileService\InAppPurchase\Exceptions\HuaweiException;
+use ReflectionObject;
+use ReflectionProperty;
+use stdClass;
 
 /**
  * This class defines attributes, valid values, and usage which is generated
  * from a given json schema.
+ * http://tools.ietf.org/html/draft-zyp-json-schema-03#section-5
  *
  */
 abstract class Model implements \ArrayAccess
 {
     /**
-     * If you need to specify a NULL JSON value, use Google_Model::NULL_VALUE
+     * If you need to specify a NULL JSON value, use Google\Model::NULL_VALUE
      * instead - it will be replaced when converting to JSON with a real null.
      */
     const NULL_VALUE = "{}gapi-php-null";
-    protected $internal_gapi_mappings = array();
-    protected $modelData = array();
-    protected $processed = array();
+    protected $internal_gapi_mappings = [];
+    protected $modelData = [];
+    protected $processed = [];
 
     /**
      * Polymorphic - accepts a variable number of arguments dependent
@@ -39,9 +43,7 @@ abstract class Model implements \ArrayAccess
 
     /**
      * Getter that handles passthrough access to the data array, and lazy object creation.
-     *
      * @param string $key Property name.
-     *
      * @return mixed The value if any, or null.
      */
     public function __get($key)
@@ -52,40 +54,37 @@ abstract class Model implements \ArrayAccess
             if (isset($this->modelData[$key])) {
                 $val = $this->modelData[$key];
             } elseif ($keyDataType == 'array' || $keyDataType == 'map') {
-                $val = array();
+                $val = [];
             } else {
                 $val = null;
             }
 
             if ($this->isAssociativeArray($val)) {
-                if ('map' == $keyDataType) {
+                if ($keyDataType && 'map' == $keyDataType) {
                     foreach ($val as $arrayKey => $arrayItem) {
-                        $this->modelData[$key][$arrayKey]
-                            = new $keyType($arrayItem);
+                        $this->modelData[$key][$arrayKey] =
+                            new $keyType($arrayItem);
                     }
                 } else {
                     $this->modelData[$key] = new $keyType($val);
                 }
-            } else {
-                if (is_array($val)) {
-                    $arrayObject = array();
-                    foreach ($val as $arrayIndex => $arrayItem) {
-                        $arrayObject[$arrayIndex] = new $keyType($arrayItem);
-                    }
-                    $this->modelData[$key] = $arrayObject;
+            } elseif (is_array($val)) {
+                $arrayObject = [];
+                foreach ($val as $arrayIndex => $arrayItem) {
+                    $arrayObject[$arrayIndex] = new $keyType($arrayItem);
                 }
+                $this->modelData[$key] = $arrayObject;
             }
             $this->processed[$key] = true;
         }
 
-        return $this->modelData[$key] ?? null;
+        return isset($this->modelData[$key]) ? $this->modelData[$key] : null;
     }
 
     /**
      * Initialize this object's properties from an array.
      *
      * @param array $array Used to seed this object's properties.
-     *
      * @return void
      */
     protected function mapTypes($array)
@@ -95,7 +94,7 @@ abstract class Model implements \ArrayAccess
             if ($keyType = $this->keyType($key)) {
                 $dataType = $this->dataType($key);
                 if ($dataType == 'array' || $dataType == 'map') {
-                    $this->$key = array();
+                    $this->$key = [];
                     foreach ($val as $itemKey => $itemVal) {
                         if ($itemVal instanceof $keyType) {
                             $this->{$key}[$itemKey] = $itemVal;
@@ -139,7 +138,7 @@ abstract class Model implements \ArrayAccess
      */
     public function toSimpleObject()
     {
-        $object = new \stdClass();
+        $object = new stdClass();
 
         // Process all other data.
         foreach ($this->modelData as $key => $val) {
@@ -150,8 +149,8 @@ abstract class Model implements \ArrayAccess
         }
 
         // Process all public properties.
-        $reflect = new \ReflectionObject($this);
-        $props = $reflect->getProperties(\ReflectionProperty::IS_PUBLIC);
+        $reflect = new ReflectionObject($this);
+        $props = $reflect->getProperties(ReflectionProperty::IS_PUBLIC);
         foreach ($props as $member) {
             $name = $member->getName();
             $result = $this->getSimpleValue($this->$name);
@@ -172,18 +171,16 @@ abstract class Model implements \ArrayAccess
     {
         if ($value instanceof Model) {
             return $value->toSimpleObject();
-        } else {
-            if (is_array($value)) {
-                $return = array();
-                foreach ($value as $key => $a_value) {
-                    $a_value = $this->getSimpleValue($a_value);
-                    if ($a_value !== null) {
-                        $key = $this->getMappedName($key);
-                        $return[$key] = $this->nullPlaceholderCheck($a_value);
-                    }
+        } elseif (is_array($value)) {
+            $return = [];
+            foreach ($value as $key => $a_value) {
+                $a_value = $this->getSimpleValue($a_value);
+                if ($a_value !== null) {
+                    $key = $this->getMappedName($key);
+                    $return[$key] = $this->nullPlaceholderCheck($a_value);
                 }
-                return $return;
             }
+            return $return;
         }
         return $value;
     }
@@ -212,9 +209,7 @@ abstract class Model implements \ArrayAccess
 
     /**
      * Returns true only if the array is associative.
-     *
      * @param array $array
-     *
      * @return bool True if the array is associative.
      */
     protected function isAssociativeArray($array)
@@ -233,10 +228,8 @@ abstract class Model implements \ArrayAccess
 
     /**
      * Verify if $obj is an array.
-     *
      * @throws HuaweiException Thrown if $obj isn't an array.
-     *
-     * @param array  $obj    Items that should be validated.
+     * @param array $obj Items that should be validated.
      * @param string $method Method expecting an array as an argument.
      */
     public function assertIsArray($obj, $method)
@@ -248,17 +241,25 @@ abstract class Model implements \ArrayAccess
         }
     }
 
-    public function offsetExists($offset): bool
+    /** @return bool */
+    #[\ReturnTypeWillChange]
+    public function offsetExists($offset)
     {
         return isset($this->$offset) || isset($this->modelData[$offset]);
     }
 
-    public function offsetGet($offset): mixed
+    /** @return mixed */
+    #[\ReturnTypeWillChange]
+    public function offsetGet($offset)
     {
-        return $this->$offset ?? $this->__get($offset);
+        return isset($this->$offset) ?
+            $this->$offset :
+            $this->__get($offset);
     }
 
-    public function offsetSet($offset, $value): void
+    /** @return void */
+    #[\ReturnTypeWillChange]
+    public function offsetSet($offset, $value)
     {
         if (property_exists($this, $offset)) {
             $this->$offset = $value;
@@ -268,7 +269,9 @@ abstract class Model implements \ArrayAccess
         }
     }
 
-    public function offsetUnset($offset): void
+    /** @return void */
+    #[\ReturnTypeWillChange]
+    public function offsetUnset($offset)
     {
         unset($this->modelData[$offset]);
     }
@@ -304,14 +307,12 @@ abstract class Model implements \ArrayAccess
 
     /**
      * Convert a string to camelCase
-     *
-     * @param string $value
-     *
+     * @param  string $value
      * @return string
      */
     private function camelCase($value)
     {
-        $value = ucwords(str_replace(array('-', '_'), ' ', $value));
+        $value = ucwords(str_replace(['-', '_'], ' ', $value));
         $value = str_replace(' ', '', $value);
         $value[0] = strtolower($value[0]);
         return $value;
