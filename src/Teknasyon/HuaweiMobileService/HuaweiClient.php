@@ -135,7 +135,7 @@ class HuaweiClient
             }
 
             if (isset($json['cancelledPurchaseList'])) {
-                $json['cancelledPurchaseList'] = json_decode($json['cancelledPurchaseList'], true);
+                $json['cancelledPurchaseList'] = json_decode($json['cancelledPurchaseList']);
             }
 
             try {
