@@ -132,6 +132,8 @@ class HuaweiClient
             // todo : an arrangement should be made to this part
             if (isset($json['inappPurchaseData'])) {
                 $json = json_decode($json['inappPurchaseData'], true);
+            } elseif (isset($json['purchaseTokenData'])) { //
+                $json = json_decode($json['purchaseTokenData'], true);
             }
 
             if (isset($json['cancelledPurchaseList'])) {
